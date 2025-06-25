@@ -1,0 +1,72 @@
+<!-- HTML结构 -->
+<div style="text-align:center; margin-top:50px;">
+  <h1 style="color:#008000;">水果vs蔬菜分类挑战</h1>
+  <div id="gameArea" style="display:flex; justify-content:center; margin-top:50px;">
+    <div id="items" style="margin-right:50px;">
+      <!-- 动态生成水果/蔬菜图案 -->
+    </div>
+    <div id="trays">
+      <div class="tray" id="fruitTray">水果区</div>
+      <div class="tray" id="vegetableTray">蔬菜区</div>
+    </div>
+  </div>
+  <button onclick="startGame()">选择难度开始游戏</button>
+</div>
+
+<!-- JavaScript逻辑（简化） -->
+<script>
+let items = []; // 存储图案元素
+let correctMatches = 0;
+let timer = 60;
+
+function startGame() {
+  // 初始化图案（示例：3水果+3蔬菜）
+  const fruits = ['苹果', '香蕉', '草莓'];
+  const vegetables = ['胡萝卜', '黄瓜', '西兰花'];
+  const allItems = [...fruits, ...vegetables].sort(() => 0.5 - Math.random());
+
+  // 生成图案元素
+  allItems.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'item';
+    div.draggable = true;
+    div.textContent = item;
+    div.style.margin = '5px';
+    div.style.background = '#FFA500'; // 橙色（示例颜色）
+    div.ondragstart = (e) => e.dataTransfer.setData('text', item);
+    items.push(div);
+  });
+  document.getElementById('items').append(...items);
+
+  // 启动倒计时
+  setInterval(() => {
+    timer--;
+    if (timer <= 0) gameOver();
+  }, 1000);
+}
+
+// 托盘Drop事件
+document.querySelectorAll('.tray').forEach(tray => {
+  tray.ondragover = (e) => e.preventDefault();
+  tray.ondrop = (e) => {
+    const item = e.dataTransfer.getData('text');
+    const isFruit = ['苹果', '香蕉', '草莓'].includes(item);
+    const targetIsFruit = tray.id === 'fruitTray';
+    
+    if (isFruit === targetIsFruit) {
+      // 正确匹配：移除图案
+      items.find(div => div.textContent === item).remove();
+      correctMatches++;
+      if (correctMatches === items.length) winGame();
+    } else {
+      // 错误匹配：恢复原位
+      // （需记录位置或重置布局，此处简化）
+    }
+  };
+});
+
+function winGame() {
+  alert('恭喜成功闯关！获得★');
+  // 重置游戏
+}
+</script>
